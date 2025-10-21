@@ -1,0 +1,60 @@
+<section th:fragment="boxoffice" xmlns:th="http://www.thymeleaf.org"
+         class="flex-1  py-12 text-center">
+
+    <!-- 상단 필터 버튼 -->
+    <div class="flex justify-center items-center gap-4 mb-6">
+        <button id="btnNow" class="toggle-btn px-4 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white hover:bg-blue-50 transition">
+            상영중
+        </button>
+        <button id="btnUpcoming" class="toggle-btn px-4 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white hover:bg-blue-50 transition">
+            상영예정
+        </button>
+    </div>
+
+    <!-- 타이틀 -->
+    <h1 class="text-xl font-semibold text-gray-800 mb-6">
+        오늘의 박스오피스 🎥
+    </h1>
+
+    <div class="max-w-5xl mx-auto">
+    <!-- 슬라이드 컨테이너 -->
+    <div class="slider-container ">
+        <!-- 왼쪽 화살표
+        -->
+        <button id="prevBtn" class="arrow-btn absolute left-0 md:-left-10">&#10094;</button>
+
+        <!-- 카드 영역 -->
+        <div class="overflow-hidden">
+            <div id="movieTrack" class="flex gap-4">
+                <!--flex transition-transform duration-500 ease-in-out-->
+                <!-- 🎬 영화 카드 반복 출력 -->
+                <div th:each="movie : ${movies}" class="card">
+
+                    <figure>
+                        <img th:src="${movie.poster.posterUrl ?: '/img/no-poster.png'}"
+                             th:alt="${movie.poster.title}"/>
+                             <!--class="rounded-t-xl h-64 object-cover w-full"-->
+
+                    </figure>
+                    <div class="card-body p-4 text-center">
+                        <h2 class="card-title text-base font-semibold justify-center" th:text="${movie.poster.title}">영화 제목</h2>
+                        <p class="text-gray-500 text-sm" th:text="${movie.info.openDt + ' 개봉'}">2025-01-01 개봉</p>
+                    </div>
+                </div>
+
+            </div>
+       </div>
+
+        <!-- 오른쪽 화살표
+         -->
+        <button id="nextBtn" class="arrow-btn absolute right-0 md:-right-10">&#10095;</button>
+    </div>
+    </div>
+    <!-- 더보기/줄이기 버튼 -->
+    <div class="flex justify-center mt-8">
+        <button id="toggleViewBtn" class="px-6 py-2 rounded-full text-sm font-medium border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-all">
+            더보기 ▼
+        </button>
+    </div>
+
+</section>

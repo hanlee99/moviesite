@@ -1,0 +1,23 @@
+body {
+  background-color: #f8f9fb;
+  color: #1f2937;
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+
+}
+.page-section {
+  height: 100vh;        /* 한 섹션이 화면 하나를 가득 채움 */
+  scroll-snap-align: start;
+}
+html { scroll-behavior: smooth; }
+
+.navbar {
+  background: #ffffff;
+  border-bottom: 3px solid #3b82f6;
+  padding: 1rem 3rem;
+}
+
+footer {
+  background-color: #ffffff;
+  border-top: 3px solid #3b82f6;
+  color: #6b7280;
+}

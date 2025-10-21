@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/demo/src/main/resources/data/fulldata_03_13_02_P_영화상영관.csv" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/demo/src/main/resources/templates/fragments/components/footer.html" charset="UTF-8" />
+  </component>
+</project>
