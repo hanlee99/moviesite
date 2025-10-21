@@ -13,11 +13,11 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class HomeController {
+public class SpaRouteController {
     private final MovieService movieService;
     String  date;
 
-    @GetMapping("/")
+    @GetMapping({"/", "/boxoffice", "/cinema", "map"})
     public String home(Model model){
         boolean test = true;
 

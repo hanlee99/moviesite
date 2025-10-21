@@ -1,6 +1,6 @@
 // app.js
 import { initBoxoffice } from './sections/boxoffice.js';
-//import { initShowtime } from './sections/showtime.js';
+import { initShowtime } from './sections/showtime.js';
 import { initCinema } from './sections/cinema.js';
 
 document.addEventListener('DOMContentLoaded', () => {

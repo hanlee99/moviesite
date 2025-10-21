@@ -12,29 +12,32 @@
     <link rel="stylesheet" th:href="@{/css/sections/cinema.css}">
 
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="min-h-screen">
 
-    <div th:replace="fragments/components/header :: site-header"></div>
-    <!--style="padding:20px;"-->
-    <main id="main" class="flex-1 w-full overflow-y-scroll snap-y snap-mandatory
-    h-screen scroll-smooth">
+    <header th:replace="fragments/components/header :: site-header"></header>
+
+    <main id="main" class="w-full snap-y snap-mandatory scroll-smooth">
+
         <div class="max-w-6xl mx-auto px-4">
-        <div class="content-container">
-            <section id="boxoffice" class="page-section snap-start h-screen"
-                     th:replace="fragments/sections/boxoffice :: boxoffice"></section>
+            <!--replace와 insert 차이 주의 replace는 fragment를 사용한 태그를 날려버림 둘다 사용하고 싶다면 insert-->
+            <section id="boxoffice" class="page-section snap-start  h-screen"
+                     th:insert="fragments/sections/boxoffice :: boxoffice"></section>
 
-            <!-- <section id="showtime" class="page-section"
-                    th:replace="fragments/sections/showtime :: showtime"></section>-->
+            <!--<div class="divider"></div>-->
 
             <section id="cinema" class="page-section snap-start h-screen"
-                    th:replace="fragments/sections/cinema :: cinema"></section>
+                     th:insert="fragments/sections/cinema :: cinema"></section>
+
+            <section id="map" class="page-section snap-start h-screen"
+                     th:insert="fragments/sections/map :: map"></section>
         </div>
-        </div>
+
     </main>
 
-    <div th:replace="fragments/components/footer :: site-footer"></div>
+    <footer th:replace="fragments/components/footer :: site-footer"></footer>
 
     <script th:src="@{/js/app.js}" type="module" defer></script>
+    <script th:src="@{/js/scrollRouter.js}" defer></script>
 
 </body>
 </html>
