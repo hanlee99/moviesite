@@ -35,3 +35,16 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Logs ###
+logs/
+*.log
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Environment / Secrets ###
+src/main/resources/application.properties
+src/main/resources/application.yml
+*.env

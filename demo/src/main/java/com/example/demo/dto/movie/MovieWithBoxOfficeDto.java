@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MovieWithPosterDto {
-    private DailyBoxOfficeDto info;
+    private DailyBoxOffice info;
     private PosterResponse poster;
 }
