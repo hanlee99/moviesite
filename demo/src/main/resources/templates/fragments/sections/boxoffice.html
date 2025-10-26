@@ -4,7 +4,7 @@
     <!-- 상단 필터 버튼 -->
     <div class="flex justify-center items-center gap-4 mb-6">
         <button id="btnNow" class="toggle-btn px-4 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white hover:bg-blue-50 transition">
-            상영중
+            최근개봉영화
         </button>
         <button id="btnUpcoming" class="toggle-btn px-4 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white hover:bg-blue-50 transition">
             상영예정
@@ -13,9 +13,11 @@
 
     <!-- 타이틀 -->
     <h1 class="text-xl font-semibold text-gray-800 mb-6">
-        오늘의 박스오피스 🎥
+        박스오피스 순위
     </h1>
 
+    <span th:text="${#temporals.format(#temporals.createNow().minusDays(1), 'yyyy-MM-dd')}">
+        2025-10-26</span>
     <div class="max-w-5xl mx-auto">
         <!-- 슬라이드 컨테이너 -->
         <div class="slider-container ">
@@ -31,13 +33,13 @@
                     <div th:each="movie : ${movies}" class="card">
 
                         <figure>
-                            <img th:src="${movie.poster.posterUrl}"
-                                 th:alt="${movie.poster.title}"/>
+                            <img th:src="${#strings.isEmpty(movie.posterUrl) ? '/images/no-poster.png' : movie.posterUrl}"
+                                 th:alt="${movie.title}" />
 
                         </figure>
                         <div class="card-body p-4 text-center">
-                            <h2 class="card-title text-base font-semibold justify-center" th:text="${movie.poster.title}">영화 제목</h2>
-                            <p class="text-gray-500 text-sm" th:text="${movie.info.openDt + ' 개봉'}">2025-01-01 개봉</p>
+                            <h2 class="card-title text-base font-semibold justify-center" th:text="${movie.title}">영화 제목</h2>
+                            <p class="text-gray-500 text-sm" th:text="${movie.openDt + ' 개봉'}">2025-01-01 개봉</p>
                         </div>
                     </div>
 

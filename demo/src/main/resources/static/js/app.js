@@ -1,13 +1,13 @@
 // app.js
 import { initBoxoffice } from './sections/boxoffice.js';
-import { initShowtime } from './sections/showtime.js';
+//import { initmap } from './sections/showtime.js';
 import { initCinema } from './sections/cinema.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   initBoxoffice(); // 첫 섹션 즉시 실행
   initCinema();
 
-  let showtimeInit = false;
+  //let mapInit = false;
   let cinemaInit = false;
 
   /*window.addEventListener('scroll', () => {

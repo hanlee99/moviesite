@@ -15,7 +15,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class SpaRouteController {
+public class BoxOfficeController {
     private final MovieService movieService;
     String  date;
     private final BoxOfficeService boxOfficeService;
@@ -23,6 +23,7 @@ public class SpaRouteController {
     //홈: 기본은 일일 박스오피스
     @GetMapping("/")
     public String home(Model model) {
+
         String date = LocalDate.now().minusDays(1)
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

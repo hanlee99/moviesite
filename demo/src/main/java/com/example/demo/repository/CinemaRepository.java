@@ -1,4 +1,7 @@
 package com.example.demo.repository;
 
-public interface CinemaRepository {
+import com.example.demo.entity.Cinema;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CinemaRepository extends JpaRepository<Cinema, Long> {
 }

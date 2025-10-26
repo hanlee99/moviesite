@@ -40,7 +40,6 @@ public class PosterService {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json; charset=UTF-8");
 
-            // 🔹 한 번의 try로만 묶기
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
 

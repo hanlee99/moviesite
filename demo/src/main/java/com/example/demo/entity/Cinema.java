@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CinemaEntity {
+public class Cinema {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,10 +42,10 @@ public class CinemaEntity {
 
     @ManyToOne
     @JoinColumn(name = "brand_id")
-    private BrandEntity brandEntity;
+    private Brand brand;
 
     @ManyToOne
     @JoinColumn(name = "region_id")
-    private RegionEntity regionEntity;
+    private Region region;
 
 }
