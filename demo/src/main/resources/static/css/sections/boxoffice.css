@@ -58,4 +58,8 @@
   transform: scale(1.1);
 }
 
+#toggleViewBtn {
+  position: relative;
+  z-index: 10;
+}
 

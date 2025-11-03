@@ -63,4 +63,30 @@ public class Movie {
     private String ratingGrade;
     private String modDate;
     private String regDate;
+
+    public void updateFrom(Movie src) {
+        this.titleEtc = src.getTitleEtc();
+        this.prodYear = src.getProdYear();
+        this.directorNm = src.getDirectorNm();
+        this.actorNm = src.getActorNm();
+        this.nation = src.getNation();
+        this.company = src.getCompany();
+        this.plot = src.getPlot();
+        this.runtime = src.getRuntime();
+        this.rating = src.getRating();
+        this.genre = src.getGenre();
+        this.kmdbUrl = src.getKmdbUrl();
+        this.type = src.getType();
+        this.useType = src.getUseType();
+        this.repRlsDate = src.getRepRlsDate();
+        this.releaseDates = src.getReleaseDates();
+        this.isReRelease = src.getIsReRelease();
+        this.posters = src.getPosters();
+        this.stlls = src.getStlls();
+        this.vodUrl = src.getVodUrl();
+        this.ratingNo = src.getRatingNo();
+        this.ratingGrade = src.getRatingGrade();
+        this.modDate = src.getModDate();
+        this.regDate = src.getRegDate();
+    }
 }

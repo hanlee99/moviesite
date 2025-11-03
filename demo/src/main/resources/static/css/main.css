@@ -8,6 +8,9 @@ main {
   background-color: #f1f5f9; /* body보다 약간 진한 톤 */
 }
 
+section {
+  outline: 1px solid red;
+}
 
 .page-section {
   min-height: 100vh;

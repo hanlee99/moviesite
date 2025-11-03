@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 
 @Component
 @RequiredArgsConstructor
-public class DataInitializer implements CommandLineRunner {
+public class CinemaCsvInitializer implements CommandLineRunner {
 
     private final BrandRepository brandRepository;
     private final RegionRepository regionRepository;
@@ -26,6 +26,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (cinemaRepository.count() > 0) {
+            System.out.println("🎦 기존 Cinema 데이터가 존재하므로 CSV 로드를 건너뜁니다.");
+            return;
+        }
+
         System.out.println("CSV 데이터 로드 시작...");
 
         var inputStream = getClass().getResourceAsStream("/data/cinema-data.csv");

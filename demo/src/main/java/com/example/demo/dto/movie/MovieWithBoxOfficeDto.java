@@ -26,7 +26,7 @@ public class MovieWithBoxOfficeDto {
     private String audiAcc;
 
     // DailyBoxOffice + MovieEntity 결합
-    public static  MovieWithBoxOfficeDto from(DailyBoxOffice box, Movie movie) {
+    public static  MovieWithBoxOfficeDto from(BoxOfficeItem box, Movie movie) {
         MovieWithBoxOfficeDto dto = new MovieWithBoxOfficeDto();
         dto.setRank(box.getRank());
         dto.setTitle(box.getMovieNm());
@@ -60,8 +60,18 @@ public class MovieWithBoxOfficeDto {
         return dto;
     }
 
+    public static MovieWithBoxOfficeDto from(Movie movie) {
+        MovieWithBoxOfficeDto dto = new MovieWithBoxOfficeDto();
+        dto.setTitle(movie.getTitle());
+        dto.setOpenDt(movie.getRepRlsDate());
+        dto.setPosterUrl(movie.getPosters());
+        dto.setGenre(movie.getGenre());
+        dto.setPlot(movie.getPlot());
+        return dto;
+    }
+
     // 박스오피스 정보만 있을 때 (포스터X)
-    public static MovieWithBoxOfficeDto fromBoxOfficeOnly(DailyBoxOffice box) {
+    public static MovieWithBoxOfficeDto fromBoxOfficeOnly(BoxOfficeItem box) {
         MovieWithBoxOfficeDto dto = new MovieWithBoxOfficeDto();
         dto.setRank(box.getRank());
         dto.setTitle(box.getMovieNm());

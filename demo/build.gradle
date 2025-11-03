@@ -10,7 +10,7 @@ description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -39,6 +39,7 @@ dependencies {
 
     implementation 'com.opencsv:opencsv:5.9'
 
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 }
 
 tasks.named('test') {

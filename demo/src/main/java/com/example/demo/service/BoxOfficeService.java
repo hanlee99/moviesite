@@ -1,8 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.movie.BoxOfficeResponse;
-import com.example.demo.dto.movie.DailyBoxOffice;
-import com.example.demo.dto.movie.MovieWithBoxOfficeDto;
+import com.example.demo.dto.movie.*;
 import com.example.demo.entity.Movie;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.or.kobis.kobisopenapi.consumer.rest.KobisOpenAPIRestService;
@@ -22,13 +20,17 @@ public class BoxOfficeService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public List<MovieWithBoxOfficeDto> getBoxOfficeWithMovie(String targetDate, String type) {
+    public BoxOfficeResultDto getBoxOfficeWithMovieResult(String targetDate, String type) {
         try {
             KobisOpenAPIRestService kobis = new KobisOpenAPIRestService(KOBIS_API_KEY);
 
             Map<String, String> params = new HashMap<>();
             params.put("targetDt", targetDate);
-            params.put("itemPerPage", "10");
+            //params.put("itemPerPage", "10");
+
+            if (type.equalsIgnoreCase("weekly")) {
+                params.put("weekGb", "0");
+            }
 
             String json = switch (type.toLowerCase()) {
                 case "weekly" -> kobis.getWeeklyBoxOffice(true, params);
@@ -36,26 +38,25 @@ public class BoxOfficeService {
             };
 
             BoxOfficeResponse response = mapper.readValue(json, BoxOfficeResponse.class);
-            List<DailyBoxOffice> list = response.getBoxOfficeResult().getDailyBoxOfficeList();
-            List<MovieWithBoxOfficeDto> result = new ArrayList<>();
+            BoxOfficeResult result = response.getBoxOfficeResult();
 
-            for (DailyBoxOffice box : list) {
+            List<MovieWithBoxOfficeDto> movieDtos = new ArrayList<>();
+            for (BoxOfficeItem box : result.getBoxOfficeList()) {
                 Movie movie = movieService.findOrFetchAndSave(
                         box.getMovieNm(),
                         box.getOpenDt().replace("-", "")
                 );
-
-                result.add(MovieWithBoxOfficeDto.from(box, movie));
-
-                System.out.printf("[%s] matched or fetched: %s%n",
-                        box.getMovieNm(),
-                        movie.getPosters() != null ? movie.getPosters() : "no poster");
+                movieDtos.add(MovieWithBoxOfficeDto.from(box, movie));
             }
 
-            return result;
+            return new BoxOfficeResultDto(
+                    result.getBoxofficeType(),
+                    result.getShowRange(),
+                    movieDtos
+            );
         } catch (Exception e) {
             e.printStackTrace();
-            return Collections.emptyList();
+            return new BoxOfficeResultDto("error", "", Collections.emptyList());
         }
     }
 }

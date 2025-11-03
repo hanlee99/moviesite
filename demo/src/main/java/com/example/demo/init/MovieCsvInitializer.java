@@ -19,6 +19,11 @@ public class MovieCsvInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (movieRepository.count() > 0) {
+            System.out.println("🎬 기존 Movie 데이터가 존재하므로 CSV 로드를 건너뜁니다.");
+            return;
+        }
+
         System.out.println("KMDB CSV 로드 시작...");
 
         var inputStream = getClass().getResourceAsStream("/data/KMDB_2025.csv");

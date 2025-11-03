@@ -3,24 +3,26 @@ package com.example.demo.service;
 import com.example.demo.entity.Movie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class KmdbService {
-
     @Value("${api.kmdb.key}")
     private String KMDB_API_KEY;
-
     private final ObjectMapper mapper = new ObjectMapper();
 
     public Movie fetchMovieByTitleAndDate(String title, String openDt) {
@@ -68,6 +70,8 @@ public class KmdbService {
             movie.setRepRlsDate(result.path("repRlsDate").asText(""));
             movie.setPosters(result.path("posters").asText(""));
             movie.setStlls(result.path("stlls").asText(""));
+            movie.setModDate(result.path("modDate").asText(""));
+            movie.setRegDate(result.path("regDate").asText(""));
 
             return movie;
 
@@ -77,6 +81,66 @@ public class KmdbService {
             return null;
         }
     }
+
+
+    public List<Movie> fetchMoviesBetweenPaged(String startDate, String endDate, int listCount, int startCount) {
+        try {
+            String url = String.format(
+                    "https://api.koreafilm.or.kr/openapi-data2/wisenut/search_api/search_json2.jsp?" +
+                            "collection=kmdb_new2&ServiceKey=%s&detail=Y" +
+                            "&listCount=%d&startCount=%d" +
+                            "&releaseDts=%s&releaseDte=%s",
+                    KMDB_API_KEY, listCount, startCount, startDate, endDate
+            );
+
+            RestTemplate rest = new RestTemplate();
+            rest.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+            String json = rest.getForObject(URI.create(url), String.class);
+            JsonNode root = mapper.readTree(json);
+
+            if (root == null || !root.has("Data") || root.path("Data").isEmpty()) return Collections.emptyList();
+
+            JsonNode results = root.path("Data").get(0).path("Result");
+            if (results == null || results.isEmpty()) return Collections.emptyList();
+
+            List<Movie> movies = new ArrayList<>();
+
+            for (JsonNode result : results) {
+                Movie movie = new Movie();
+                movie.setTitle(result.path("title").asText(""));
+                movie.setTitleEtc(result.path("titleEtc").asText(""));
+                movie.setProdYear(result.path("prodYear").asText(""));
+                movie.setDirectorNm(result.path("directors").path("director").get(0).path("directorNm").asText(""));
+                movie.setActorNm(result.path("actors").path("actor").get(0).path("actorNm").asText(""));
+                movie.setNation(result.path("nation").asText(""));
+                movie.setCompany(result.path("company").asText(""));
+                movie.setPlot(result.path("plots").path("plot").get(0).path("plotText").asText(""));
+                movie.setRuntime(result.path("runtime").asText(""));
+                movie.setRating(result.path("rating").asText(""));
+                movie.setGenre(result.path("genre").asText(""));
+                movie.setKmdbUrl(result.path("kmdbUrl").asText(""));
+                movie.setType(result.path("type").asText(""));
+                movie.setUseType(result.path("use").asText(""));
+                movie.setRepRlsDate(result.path("repRlsDate").asText(""));
+                movie.setPosters(result.path("posters").asText(""));
+                movie.setStlls(result.path("stlls").asText(""));
+                movie.setModDate(result.path("modDate").asText(""));
+                movie.setRegDate(result.path("regDate").asText(""));
+                movies.add(movie);
+            }
+
+            return movies;
+
+        } catch (Exception e) {
+            System.err.printf("KMDB 요청 실패 (%s~%s, startCount=%d)%n", startDate, endDate, startCount);
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+
+
 
 
 
