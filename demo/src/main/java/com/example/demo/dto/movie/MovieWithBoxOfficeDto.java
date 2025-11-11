@@ -70,15 +70,4 @@ public class MovieWithBoxOfficeDto {
         return dto;
     }
 
-    // 박스오피스 정보만 있을 때 (포스터X)
-    public static MovieWithBoxOfficeDto fromBoxOfficeOnly(BoxOfficeItem box) {
-        MovieWithBoxOfficeDto dto = new MovieWithBoxOfficeDto();
-        dto.setRank(box.getRank());
-        dto.setTitle(box.getMovieNm());
-        dto.setOpenDt(box.getOpenDt());
-        dto.setSalesAcc(box.getSalesAcc());
-        dto.setAudiCnt(box.getAudiCnt());
-        dto.setAudiAcc(box.getAudiAcc());
-        return dto;
-    }
 }

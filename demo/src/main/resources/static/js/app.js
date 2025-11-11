@@ -1,40 +1,45 @@
 // app.js
 import { initBoxoffice } from './sections/boxoffice.js';
 import { initCinema } from './sections/cinema.js';
-// import { initMap } from './sections/showtime.js';
+// import { initMap } from './sections/map.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const boxofficeSection = document.querySelector('#boxoffice');
-  const cinemaSection = document.querySelector('#cinema');
-  const mapSection = document.querySelector('#map');
+  const sections = {
+    boxoffice: document.querySelector('#boxoffice'),
+    cinema: document.querySelector('#cinema'),
+    map: document.querySelector('#map')
+  };
 
-  const sections = [boxofficeSection, cinemaSection, mapSection];
-  const navLinks = document.querySelectorAll('header nav a');
+  const initializers = {
+    boxoffice: initBoxoffice,
+    cinema: initCinema,
+    // map: initMap
+  };
 
-  // ✅ 처음엔 박스오피스만 표시
-  sections.forEach(sec => (sec.style.display = 'none'));
-  boxofficeSection.style.display = 'block';
+  // ✅ 초기 상태: 박스오피스만 표시
+  Object.values(sections).forEach(sec => sec.style.display = 'none');
+  sections.boxoffice.style.display = 'block';
   initBoxoffice();
 
-  // ✅ nav 클릭 시 섹션 전환
-  navLinks.forEach(link => {
+  // ✅ 네비게이션 클릭 핸들러
+  document.querySelectorAll('header nav a').forEach(link => {
     link.addEventListener('click', e => {
-      e.preventDefault(); // 페이지 점프 방지
-      const targetId = link.getAttribute('href').replace('#', ''); // ex) 'cinema'
-      const targetSection = document.getElementById(targetId);
+      e.preventDefault();
 
+      const targetId = link.getAttribute('href').slice(1); // '#boxoffice' → 'boxoffice'
+      const targetSection = sections[targetId];
+
+      if (!targetSection) return;
+
+      // 스크롤 최상단 이동
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // 모든 섹션 숨기기
-      sections.forEach(sec => (sec.style.display = 'none'));
+      Object.values(sections).forEach(sec => sec.style.display = 'none');
 
-      // 선택한 섹션만 표시
+      // 선택 섹션 표시 및 초기화
       targetSection.style.display = 'block';
-
-      // 필요 시 각 섹션 초기화
-      if (targetId === 'boxoffice') initBoxoffice();
-      if (targetId === 'cinema') initCinema();
-      // if (targetId === 'map') initMap();
+      initializers[targetId]?.();
     });
   });
 });

@@ -3,13 +3,11 @@ package com.example.demo.service;
 import com.example.demo.entity.Movie;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -131,17 +129,11 @@ public class KmdbService {
             }
 
             return movies;
-
         } catch (Exception e) {
             System.err.printf("KMDB 요청 실패 (%s~%s, startCount=%d)%n", startDate, endDate, startCount);
             e.printStackTrace();
             return Collections.emptyList();
         }
     }
-
-
-
-
-
 
 }

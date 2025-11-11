@@ -1,47 +1,87 @@
 body {
-  background-color: #f8f9fb;
-  color: #1f2937;
+  background-color:
+#f8f9fb;
+  color:
+#1f2937;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 
 main {
-  background-color: #f1f5f9; /* body보다 약간 진한 톤 */
+  background-color:
+#f1f5f9;
+  min-height: 100vh; /* ✅ 추가 */
 }
 
-section {
-  outline: 1px solid red;
-}
 
 .page-section {
   min-height: 100vh;
-  scroll-margin-top: 70px; /* ✅ 헤더 높이만큼 자동 보정 */
 }
-
-/* 🔹 섹션 사이 구분선 */
-.divider {
-  width: 100%;
-  height: 3px;
-  background-color: #3b82f6; /* 파란 줄 */
-
+#main, footer {
+    margin-left: 80px; /* sidebar width */
 }
 
 header {
-  background: #ffffff;
-  border-bottom: 3px solid #3b82f6;
+  background:
+#ffffff;
+  border-bottom: 3px solid
+#3b82f6;
   padding: 1rem 3rem;
 }
 
 footer {
-  background-color: #ffffff;
-  border-top: 3px solid #3b82f6;
-  color: #6b7280;
+  background-color:
+#ffffff;
+  border-top: 3px solid
+#3b82f6;
+  color:
+#6b7280;
 }
 
-
-#boxoffice {
-  background: linear-gradient(180deg, #ffffff, #f2f6ff);
+#boxoffice, #cinema {
+  background: linear-gradient(180deg,#ffffff,#f2f6ff);
 }
 
-#cinema {
-  background: linear-gradient(180deg, #ffffff, #f2f6ff);
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100vh;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    z-index: 100;
+}
+
+.logo {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.nav-item {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: white;
+    font-size: 1.2rem;
+    transition: background 0.25s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #3b82f6;
 }

@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class MovieCsvInitializer implements CommandLineRunner {
 

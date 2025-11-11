@@ -26,7 +26,6 @@ public class BoxOfficeService {
 
             Map<String, String> params = new HashMap<>();
             params.put("targetDt", targetDate);
-            //params.put("itemPerPage", "10");
 
             if (type.equalsIgnoreCase("weekly")) {
                 params.put("weekGb", "0");
@@ -59,4 +58,5 @@ public class BoxOfficeService {
             return new BoxOfficeResultDto("error", "", Collections.emptyList());
         }
     }
+
 }

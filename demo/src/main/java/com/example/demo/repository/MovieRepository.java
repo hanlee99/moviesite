@@ -19,6 +19,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "WHERE REPLACE(m.title, ' ', '') LIKE CONCAT('%', REPLACE(:title, ' ', ''), '%')")
     Optional<Movie> findByTitleLoose(@Param("title") String title);
 
+    Optional<Movie> findByTitle(String title);
+
+
     @Query("""
     SELECT m FROM Movie m
     WHERE m.repRlsDate BETWEEN :start AND :end

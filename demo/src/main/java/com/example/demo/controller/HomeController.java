@@ -49,18 +49,4 @@ public class HomeController {
         return "home";
     }
 
-    // 🎞주간 / 일간 토글 요청 (버튼으로 전환)
-    @GetMapping("/boxoffice")
-    public String showBoxOffice(@RequestParam(defaultValue = "daily") String type, Model model) {
-        String dailyDate = LocalDate.now().minusDays(1)
-                .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-        BoxOfficeResultDto daily = boxOfficeService.getBoxOfficeWithMovieResult(dailyDate, "daily");
-
-        model.addAttribute("dailyMovies", daily.getMovies());
-        model.addAttribute("dailyRange", daily.getShowRange());
-        model.addAttribute("type", type);
-        return "home"; //동일한 템플릿 사용 (home.html)
-    }
-
 }

@@ -5,8 +5,28 @@
         영화관 찾기
     </h2>
 
+    <!-- 지역 필터 -->
     <div class="filter-section">
-        <h3>🏢 브랜드</h3>
+        <h3>📍 지역</h3>
+        <div class="filter-chips">
+            <button class="chip" data-region="서울">서울</button>
+            <button class="chip" data-region="경기">경기</button>
+            <button class="chip" data-region="인천">인천</button>
+
+            <button class="chip" data-region="대전/충청/세종">대전/충청/세종</button>
+
+            <button class="chip" data-region="대구/경북">대구/경북</button>
+            <button class="chip" data-region="부산/울산/경남">부산/울산/경남</button>
+
+            <button class="chip" data-region="전라/광주">전라/광주</button>
+
+            <button class="chip" data-region="강원">강원</button>
+            <button class="chip" data-region="제주">제주</button>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <h3 class="text-base font-semibold text-gray-800 mb-4">🏢 브랜드</h3>
         <div class="filter-chips">
             <button class="chip active" data-brand="all">전체</button>
             <button class="chip" data-brand="cgv">CGV</button>
@@ -15,32 +35,21 @@
         </div>
     </div>
 
-    <!-- 지역 필터 -->
-    <div class="filter-section">
-        <h3>📍 지역</h3>
-        <div class="filter-chips">
-            <button class="chip active" data-region="all">전체</button>
-            <button class="chip" data-region="서울">서울</button>
-            <button class="chip" data-region="경기">경기</button>
-            <button class="chip" data-region="부산">부산</button>
-            <button class="chip" data-region="대구">대구</button>
-            <button class="chip" data-region="인천">인천</button>
-        </div>
-    </div>
-
     <!-- 특별관 필터 -->
     <div class="filter-section">
         <h3>✨ 특별관</h3>
         <div class="filter-chips">
             <button class="chip active" data-special="all">전체</button>
-            <button class="chip" data-special="imax">IMAX</button>
+            <button class="chip" data-special="imax">아이맥스</button>
             <button class="chip" data-special="4dx">4DX</button>
-            <button class="chip" data-special="dolby">돌비시네마</button>
-            <button class="chip" data-special="screenx">ScreenX</button>
+
+            <button class="chip" data-special="superFlex">수퍼플렉스</button>
+
+            <button class="chip" data-special="dolbyCinema">DOLBY CINEMA</button>
         </div>
     </div>
 
-    <!-- 결과 -->
+    <!-- 결과-->
     <div class="theater-results">
         <div class="theater-card">
             <h3>CGV 강남 IMAX</h3>

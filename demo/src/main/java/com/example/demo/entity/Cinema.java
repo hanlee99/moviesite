@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,8 +27,8 @@ public class Cinema {
     @Column(length = 20)
     private String businessStatus;
 
-    @Column(length = 20)
-    private String classificationRegion;
+    @Column(length = 50)
+    private String classificationRegion; // ex. 서울 (브랜드 기준 지역명)
 
     @Column(length = 255)
     private String streetAddress;
@@ -48,4 +50,12 @@ public class Cinema {
     @JoinColumn(name = "region_id")
     private Region region;
 
+    @ManyToMany
+    @JoinTable(
+            name = "cinema_specialtytheater",  // ✅ 테이블명 통일
+            joinColumns = @JoinColumn(name = "cinema_id"),
+            inverseJoinColumns = @JoinColumn(name = "specialtytheater_id") // ✅ 컬럼명 통일
+    )
+
+    private Set<SpecialtyTheater> specialtyTheaters = new HashSet<>();
 }
