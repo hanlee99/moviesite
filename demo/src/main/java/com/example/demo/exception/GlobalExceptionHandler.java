@@ -1,15 +1,20 @@
 package com.example.demo.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MovieNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleMovieNotFound(MovieNotFoundException e, HttpServletRequest request) {
+        log.warn("영화를 찾을 수 없음: {}, URI: {}", e.getMessage(), request.getRequestURI());
+
+
         ErrorResponse error = new ErrorResponse(
                 "NOT_FOUND",
                 e.getMessage(),
@@ -20,6 +25,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException e, HttpServletRequest request) {
+        log.warn("잘못된 요청: {}, URI: {}", e.getMessage(), request.getRequestURI());
+
         ErrorResponse error = new ErrorResponse(
                 "BAD_REQUEST",
                 e.getMessage(),
@@ -30,6 +37,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExternalApiException.class)  // 👈 부모로 통합!
     public ResponseEntity<ErrorResponse> handleExternalApi(ExternalApiException e, HttpServletRequest request) {
+        log.error("외부 API 호출 실패: {}, URI: {}", e.getMessage(), request.getRequestURI());
+
         ErrorResponse error = new ErrorResponse(
                 "EXTERNAL_API_ERROR",
                 e.getMessage(),
@@ -40,6 +49,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleDefault(Exception e, HttpServletRequest request) {
+        log.error("예상치 못한 에러 발생, URI: {}", request.getRequestURI(), e);
+
         ErrorResponse error = new ErrorResponse(
                 "ERROR",
                 e.getMessage(),

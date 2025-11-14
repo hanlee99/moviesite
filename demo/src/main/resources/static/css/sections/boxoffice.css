@@ -1,97 +1,38 @@
-/* ============ 박스오피스 헤더 ============ */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+#movieTrack {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
 }
 
-#title {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: #2C3E50;
-  margin: 0;
-}
-
-.date {
-  font-size: 0.875rem;
-  color: #7F8C8D;
-  font-weight: 500;
-}
-
-/* ============ 탭 ============ */
-.tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 2.5rem;
-  border-bottom: 2px solid #E8ECEF;
-  padding-bottom: 4px;
-}
-
-.tab {
-  padding: 12px 24px;
-  background: none;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  color: #7F8C8D;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-  border-radius: 8px 8px 0 0;
-}
-
-.tab:hover {
-  color: #4A90E2;
-  background: rgba(74, 144, 226, 0.05);
-}
-
-.tab.active {
-  color: #2C3E50;
-  background: rgba(255, 244, 79, 0.15);
-}
-
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #FFF44F, #4A90E2);
-  border-radius: 2px;
-}
-
-/* ============ 토글 버튼 숨김 ============ */
-.flex.items-center.justify-end {
-  display: none !important; /* 오른쪽 토글 버튼 숨김 */
-}
-
-/* ============ 기존 스타일 유지 ============ */
 .card {
-  border-radius: 1rem;
-  border: 1px solid #e5e7eb;
-  flex: 0 0 auto;
-  width: 14rem;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border-radius: 1rem;
+    border:   1px solid #e5e7eb;
+    flex: 0 0 auto;
+    width: 14rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .slider-container {
-  position: relative;
+  position: relative; /* 버튼 기준점! */
   display: flex;
   align-items: center;
+
 }
 
 .card img {
   width: 100%;
-  object-fit: cover;
-  border-radius: 1rem;
-  display: block;
+  object-fit: cover; /* 이미지 비율 유지하면서 카드 영역에 꽉 차게 */
+  border-radius: 1rem; /* 카드의 모서리와 동일하게 */
+  display: block; /* inline 요소의 여백 제거 */
 }
 
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.toggle-btn.active {
+  background-color: #3b82f6;
+  color: white;
 }
 
 .arrow-btn {
@@ -106,7 +47,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;*/
+
 }
 
 .arrow-btn:hover {
@@ -120,32 +62,3 @@
   z-index: 10;
 }
 
-/* 반응형 */
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  #title {
-    font-size: 1.5rem;
-  }
-
-  .tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .card {
-    width: 150px;
-  }
-
-  .arrow-btn {
-    display: none;
-  }
-}

@@ -1,51 +1,37 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.Movie;
+import com.example.demo.entity.MovieEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface MovieRepository extends JpaRepository<Movie, Long> {
-    @Query("SELECT m FROM Movie m " +
-            "WHERE REPLACE(m.title, ' ', '') = REPLACE(:title, ' ', '') AND m.repRlsDate = :repRlsDate")
-    Optional<Movie> findByTitleAndRepRlsDateNormalized(@Param("title") String title, @Param("repRlsDate") String repRlsDate);
+public interface MovieRepository extends JpaRepository<MovieEntity, Long> {
 
-    @Query("SELECT m FROM Movie m " +
-            "WHERE REPLACE(m.title, ' ', '') LIKE CONCAT('%', REPLACE(:title, ' ', ''), '%')")
-    Optional<Movie> findByTitleLoose(@Param("title") String title);
+    boolean existsByDocId(String docId);
 
-    Optional<Movie> findByTitle(String title);
+    Optional<MovieEntity> findByMovieId(String movieId);
 
 
-    @Query("""
-    SELECT m FROM Movie m
-    WHERE m.repRlsDate BETWEEN :start AND :end
-    AND LENGTH(m.repRlsDate) = 8
-    AND NOT m.repRlsDate LIKE '%00'
-    ORDER BY m.repRlsDate DESC, m.title ASC
-""")
-    Page<Movie> findNowPlaying(
-            @Param("start") String start,
-            @Param("end") String end,
-            Pageable pageable
-    );
+    // 제목 리스트로 조회
+    List<MovieEntity> findByTitleIn(List<String> titles);
 
-    @Query("""
-    SELECT m FROM Movie m
-    WHERE m.repRlsDate BETWEEN :start AND :end
-    AND LENGTH(m.repRlsDate) = 8
-    AND NOT m.repRlsDate LIKE '%00'
-    ORDER BY m.repRlsDate ASC, m.title ASC
-""")
-    Page<Movie> findUpcoming(
-            @Param("start") String start,
-            @Param("end") String end,
-            Pageable pageable
-    );
+    @Query("SELECT m FROM MovieEntity m WHERE m.title LIKE %:title%")
+    List<MovieEntity> findByTitleContains(@Param("title") String title);
 
+
+    // 또는 제목 + 개봉일 (더 정확)
+    Optional<MovieEntity> findByTitleAndRepRlsDate(String title, String repRlsDate);
+
+    List<MovieEntity> findAllByTitleContainingIgnoreCase(String title);
+
+    Page<MovieEntity> findByRepRlsDateLessThanEqualOrderByRepRlsDateDesc(String today, Pageable pageable);
+
+    Page<MovieEntity> findByRepRlsDateGreaterThanOrderByRepRlsDateAsc(String today, Pageable pageable);
 }

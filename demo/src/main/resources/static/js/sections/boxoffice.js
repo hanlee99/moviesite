@@ -8,54 +8,33 @@ export function initBoxoffice() {
   const listViewBtn = document.getElementById("listViewBtn");
   const toggleBtn = document.getElementById("toggleViewBtn");
 
-
-  const btns = {
-    daily: document.getElementById("btnDaily"),
-    weekly: document.getElementById("btnWeekly"),
-    now: document.getElementById("btnNow"),
-    upcoming: document.getElementById("btnUpcoming"),
-  };
-
   let isListView = false;
-  const { daily, weekly, nowPlaying, upcoming } = window.boxofficeData;
+  const { daily, nowPlaying, upcoming } = window.boxofficeData;  // ⭐ weekly 제거 완료
   let currentSlide = 0;
   let slides = [];
   let movies = [];
   let len = 4;
   let currentType = "daily";
-  let currentPage = 0;
-  let totalLoaded = 0;
-  const pageSize = 20;
-  const maxCount = 150;
 
   track.style.display = "flex";
   track.style.gap = "16px";
   track.style.transition = "transform 0.5s ease";
 
-  // ✅ updateToggleBtn을 먼저 선언
-  function updateToggleBtn(type) {
-    if ((type === "now" || type === "upcoming") && isListView) {
-      toggleBtn.classList.remove("hidden");
-      toggleBtn.textContent = "더보기 ▼";
-      toggleBtn.disabled = false;
-    } else {
-      toggleBtn.classList.add("hidden");
-    }
-  }
-
+  // 슬라이드 그룹 만들기
   function makeSlides(total) {
     const result = [];
     const lastStart = Math.max(0, total - len);
 
     for (let i = 0; i < lastStart; i += len) {
-      result.push([i, i+1, i+2, i+3]);
+      result.push([i, i + 1, i + 2, i + 3]);
     }
 
+    // 마지막 그룹
     if (total > len) {
       const last = [];
       for (let i = lastStart; i < total; i++) last.push(i);
       result.push(last);
-    } else if (total <= len) {
+    } else {
       const all = [];
       for (let i = 0; i < total; i++) all.push(i);
       result.push(all);
@@ -65,7 +44,7 @@ export function initBoxoffice() {
   }
 
   function renderCards() {
-    while (track.firstChild) track.removeChild(track.firstChild);
+    track.innerHTML = "";
 
     movies.forEach((m, i) => {
       const card = document.createElement("div");
@@ -74,7 +53,7 @@ export function initBoxoffice() {
 
       const figure = document.createElement("figure");
       const img = document.createElement("img");
-      img.src = m.posterUrl || (m.posters?.split("|")[0]) || "/images/no-poster.png";
+      img.src = m.poster || (m.posters?.split("|")[0]) || "/images/no-poster.png";
       img.alt = m.title;
       figure.appendChild(img);
 
@@ -91,10 +70,11 @@ export function initBoxoffice() {
 
       body.append(h2, date);
       card.append(figure, body);
+
       track.appendChild(card);
     });
 
-    setTimeout(() => updateSlide(false), 50);
+    setTimeout(() => updateSlide(false), 30);
   }
 
   function updateSlide(animate = true) {
@@ -113,20 +93,20 @@ export function initBoxoffice() {
     updateSlide(true);
   }
 
+  // ⭐ 주간 관련 부분 전부 제거한 switchTo
   function switchTo(type, data, label, isList) {
     currentType = type;
     currentSlide = 0;
-    movies = isList ? data : data.movies;
+    movies = Array.isArray(data) ? data : data.movies;
     slides = makeSlides(movies.length);
 
-    // ✅ 더보기 관련 상태 초기화
-    currentPage = 0;
-    totalLoaded = movies.length;
-
     title.textContent = label;
-    showRange.textContent = (type === 'daily' || type === 'weekly')
-      ? data.showRange
-      : new Date().toISOString().slice(0, 10).replace(/-/g, "");
+
+    if (type === "daily") {
+      showRange.textContent = data.showRange || data.range || "";
+    } else {
+      showRange.textContent = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    }
 
     renderCards();
 
@@ -138,23 +118,30 @@ export function initBoxoffice() {
       nextBtn.style.display = movies.length > len ? "flex" : "none";
     }
 
-    Object.values(btns).forEach(b => b?.classList.remove("active"));
-    btns[type]?.classList.add("active");
-
+    Object.values(btns).forEach(b => b?.classList.remove("bg-blue-50"));
+    btns[type]?.classList.add("bg-blue-50");
 
     updateToggleBtn(type);
   }
 
-
+  // ⭐ weekly 버튼 제거 후 정리됨
+  const btns = {
+    daily: document.getElementById("btnDaily"),
+    now: document.getElementById("btnNow"),
+    upcoming: document.getElementById("btnUpcoming"),
+  };
 
   btns.daily?.addEventListener("click", () => switchTo("daily", daily, "일간 박스오피스", false));
-  btns.weekly?.addEventListener("click", () => switchTo("weekly", weekly, "주간 박스오피스", false));
   btns.now?.addEventListener("click", () => switchTo("now", nowPlaying, "최근 개봉 영화", true));
   btns.upcoming?.addEventListener("click", () => switchTo("upcoming", upcoming, "상영 예정 영화", true));
 
   nextBtn?.addEventListener("click", () => move(1));
   prevBtn?.addEventListener("click", () => move(-1));
 
+  // ⭐ 초기 상태 → 일간만
+  switchTo("daily", daily, "일간 박스오피스", false);
+
+  // ✨ 보기모드 전환
   listViewBtn?.addEventListener("click", () => {
     isListView = true;
     track.style.transition = "none";
@@ -163,8 +150,10 @@ export function initBoxoffice() {
     track.style.justifyContent = "center";
     prevBtn.style.display = "none";
     nextBtn.style.display = "none";
+
     listViewBtn.classList.add("bg-blue-100");
     slideViewBtn.classList.remove("bg-blue-100");
+
     updateToggleBtn(currentType);
   });
 
@@ -174,24 +163,44 @@ export function initBoxoffice() {
     track.style.justifyContent = "flex-start";
     prevBtn.style.display = movies.length > len ? "flex" : "none";
     nextBtn.style.display = movies.length > len ? "flex" : "none";
+
     updateSlide(false);
+
     slideViewBtn.classList.add("bg-blue-100");
     listViewBtn.classList.remove("bg-blue-100");
+
     updateToggleBtn(currentType);
   });
 
+  function updateToggleBtn(type) {
+    if ((type === "now" || type === "upcoming") && isListView) {
+      toggleBtn.classList.remove("hidden");
+    } else {
+      toggleBtn.classList.add("hidden");
+    }
+  }
+
+  // ✨ 더보기 버튼
+  let currentPage = 0;
+  const pageSize = 20;
+  const maxCount = 150;
+  let totalLoaded = 0;
+
   toggleBtn?.addEventListener("click", async () => {
-    // ✅ 버튼 비활성화
-    const allButtons = [...Object.values(btns), prevBtn, nextBtn, slideViewBtn, listViewBtn, toggleBtn];
-    allButtons.forEach(b => b && (b.disabled = true));
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    slideViewBtn.disabled = true;
+    listViewBtn.disabled = true;
+    Object.values(btns).forEach(b => (b.disabled = true));
 
     if (totalLoaded >= maxCount) {
       toggleBtn.textContent = "마지막 페이지입니다";
+      toggleBtn.disabled = true;
       return;
     }
 
     currentPage++;
-    const endpoint = currentType === "now" ? "/api/now-playing" : "/api/upcoming";
+    const endpoint = currentType === "now" ? "/movie/now-playing" : "/movie/upcoming";
     const url = `${endpoint}?page=${currentPage}&size=${pageSize}`;
 
     try {
@@ -199,10 +208,8 @@ export function initBoxoffice() {
       const newMovies = await res.json();
 
       if (!Array.isArray(newMovies) || newMovies.length === 0) {
-        toggleBtn.textContent = "마지막";
+        toggleBtn.textContent = "더 이상 데이터 없음";
         toggleBtn.disabled = true;
-        // ✅ 다른 버튼만 다시 활성화
-        allButtons.filter(b => b !== toggleBtn).forEach(b => b && (b.disabled = false));
         return;
       }
 
@@ -211,9 +218,10 @@ export function initBoxoffice() {
       newMovies.forEach((m) => {
         const card = document.createElement("div");
         card.className = "card";
+
         const figure = document.createElement("figure");
         const img = document.createElement("img");
-        img.src = m.posterUrl || (m.posters?.split("|")[0]) || "/images/no-poster.png";
+        img.src = m.poster || (m.posters?.split("|")[0]) || "/images/no-poster.png";
         img.alt = m.title;
         figure.appendChild(img);
 
@@ -230,21 +238,12 @@ export function initBoxoffice() {
 
         body.append(h2, date);
         card.append(figure, body);
+
         track.appendChild(card);
       });
-
-      // ✅ 버튼 다시 활성화
-      allButtons.forEach(b => b && (b.disabled = false));
-
     } catch (err) {
       console.error("더보기 요청 실패:", err);
       toggleBtn.classList.add("hidden");
-      // ✅ 에러 시에도 버튼 활성화
-      allButtons.forEach(b => b && (b.disabled = false));
     }
   });
-
-  // ✅ 초기화
-  slideViewBtn.classList.add("bg-blue-100");
-  switchTo("daily", daily, "일간 박스오피스", false);
 }

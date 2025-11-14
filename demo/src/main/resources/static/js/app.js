@@ -1,45 +1,40 @@
 // app.js
 import { initBoxoffice } from './sections/boxoffice.js';
 import { initCinema } from './sections/cinema.js';
-// import { initMap } from './sections/map.js';
+// import { initMap } from './sections/showtime.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const sections = {
-    boxoffice: document.querySelector('#boxoffice'),
-    cinema: document.querySelector('#cinema'),
-    map: document.querySelector('#map')
-  };
+  const boxofficeSection = document.querySelector('#boxoffice');
+  const cinemaSection = document.querySelector('#cinema');
+  const mapSection = document.querySelector('#map');
 
-  const initializers = {
-    boxoffice: initBoxoffice,
-    cinema: initCinema,
-    // map: initMap
-  };
+  const sections = [boxofficeSection, cinemaSection, mapSection];
+  const navLinks = document.querySelectorAll('header nav a');
 
-  // ✅ 초기 상태: 박스오피스만 표시
-  Object.values(sections).forEach(sec => sec.style.display = 'none');
-  sections.boxoffice.style.display = 'block';
+  // ⭐ init 함수는 최초 1회만 실행
   initBoxoffice();
+  initCinema();
+  // initMap();
 
-  // ✅ 네비게이션 클릭 핸들러
-  document.querySelectorAll('header nav a').forEach(link => {
+  // ⭐ 처음엔 박스오피스만 표시
+  sections.forEach(sec => (sec.style.display = 'none'));
+  boxofficeSection.style.display = 'block';
+
+  // ⭐ nav 클릭 시 섹션 전환만 수행
+  navLinks.forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
 
-      const targetId = link.getAttribute('href').slice(1); // '#boxoffice' → 'boxoffice'
-      const targetSection = sections[targetId];
+      const targetId = link.getAttribute('href').replace('#', '');
+      const targetSection = document.getElementById(targetId);
 
-      if (!targetSection) return;
-
-      // 스크롤 최상단 이동
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // 모든 섹션 숨기기
-      Object.values(sections).forEach(sec => sec.style.display = 'none');
+      sections.forEach(sec => (sec.style.display = 'none'));
 
-      // 선택 섹션 표시 및 초기화
+      // 선택한 섹션만 표시
       targetSection.style.display = 'block';
-      initializers[targetId]?.();
     });
   });
 });

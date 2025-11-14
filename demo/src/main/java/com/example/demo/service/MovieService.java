@@ -1,10 +1,18 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Movie;
-import com.example.demo.exception.MovieNotFoundException;
+import com.example.demo.dto.movie.DailyBoxOfficeResponse;
+import com.example.demo.dto.movie.MovieResponseDto;
+import com.example.demo.dto.movie.boxoffice.BoxOfficeItemDto;
+import com.example.demo.dto.movie.boxoffice.DailyBoxOfficeResultDto;
+import com.example.demo.dto.movie.kmdb.KmdbMovieDto;
+import com.example.demo.entity.MovieEntity;
+import com.example.demo.external.adapter.KmdbAdapter;
+import com.example.demo.external.adapter.KobisAdapter;
 import com.example.demo.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,140 +21,113 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MovieService {
     private final MovieRepository movieRepository;
-    private final KmdbService kmdbService;
+    private final KmdbAdapter kmdbAdapter;
+    private final KobisAdapter kobisAdapter;
 
-    public Movie getMovie(Long id) {
-        return movieRepository.findById(id)
-                .orElseThrow(() -> new MovieNotFoundException(id));
-        // 👆 영화 없으면 예외 발생!
-    }
+    public List<MovieResponseDto> searchMovie(String title) {
+        log.info("KMDB API 영화 검색 시작 - title: {}", title);
+        try {
+            List<KmdbMovieDto> kmdbMovies = kmdbAdapter.fetchMovies(title);
+            log.info("KMDB API 영화 검색 완료 - {}건", kmdbMovies.size());
 
-    public Optional<Movie> findByTitleAndOpenDate(String title, String openDate) {
-        return movieRepository.findByTitleAndRepRlsDateNormalized(title, openDate);
-    }
-
-    public Movie save(Movie movie) {
-        return movieRepository.save(movie);
-    }
-
-    @Transactional
-    public Movie findOrFetchAndSave(String title, String openDate) {
-        String date = openDate.replace("-", "");
-
-        // 1. title + openDt 정확 검색
-        Optional<Movie> exact = findByTitleAndOpenDate(title, openDate);
-
-        if (exact.isPresent()) {
-            return exact.get();
+            return kmdbMovies.stream()
+                    .map(dto -> {
+                        MovieEntity temp = MovieEntity.from(dto);
+                        return MovieResponseDto.from(temp);
+                    })
+                    .toList();
+        } catch (Exception e) {
+            log.error("KMDB API 영화 검색 실패 - title: {}", title, e);
+            throw e;
         }
-
-        // 2. title-only 검색 (넓은 매칭)
-        Optional<Movie> loose = movieRepository.findByTitle(title); // <= 이런 메서드만 만들면 됨
-
-        if (loose.isPresent()) {
-            return loose.get();
-        }
-
-        // 3. 그래도 없으면 KMDB 요청
-        Movie fetched = kmdbService.fetchMovieByTitleAndDate(title, date);
-
-        if (fetched == null) {
-            log.error("KMDB에서 데이터를 찾을 수 없습니다: title={}, date={}", title, date);  // 👈 변경!
-            return new Movie();
-        }
-
-        // 4. DB 저장
-        return save(fetched);
     }
 
+    public List<MovieResponseDto> findMoviesByTitle(String title) {
+        log.debug("DB 영화 검색 - title: {}", title);
+        List<MovieEntity> movies = movieRepository.findAllByTitleContainingIgnoreCase(title);
+        log.debug("DB 영화 검색 결과 - {}건", movies.size());
 
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-    //현재 상영중
-    public List<Movie> getNowPlaying(int page, int size) {
-        LocalDate today = LocalDate.now();
-        String end = today.format(FMT);
-        String start = today.minusDays(60).format(FMT);
-
-        Pageable pageable = PageRequest.of(page, size);
-        return movieRepository.findNowPlaying(start, end, pageable)
-                .stream()
-                .filter(m -> isValidDate(m.getRepRlsDate())) // ✅ 00으로 끝나는 날짜 제거
+        return movies.stream()
+                .map(MovieResponseDto::from)
                 .toList();
     }
 
-    //개봉 예정
-    public List<Movie> getUpcoming(int page, int size) {
-        LocalDate today = LocalDate.now();
-        String start = today.plusDays(1).format(FMT);
-        String end = today.plusDays(60).format(FMT);
+    public Page<MovieResponseDto> getNowPlaying(int page, int size) {
+        String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        log.debug("현재 상영작 조회 - page: {}, size: {}, date: {}", page, size, today);
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return movieRepository.findUpcoming(start, end, pageable)
-                .stream()
-                .filter(m -> isValidDate(m.getRepRlsDate())) // ✅ 00으로 끝나는 날짜 제거
-                .toList();
+        return movieRepository.findByRepRlsDateLessThanEqualOrderByRepRlsDateDesc(today, pageable)
+                .map(MovieResponseDto::summary);
     }
 
-    private boolean isValidDate(String date) {
-        return date != null && date.length() == 8 && !date.endsWith("00");
+    public Page<MovieResponseDto> getUpcoming(int page, int size) {
+        String today = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        log.debug("개봉 예정작 조회 - page: {}, size: {}, date: {}", page, size, today);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return movieRepository.findByRepRlsDateGreaterThanOrderByRepRlsDateAsc(today, pageable)
+                .map(MovieResponseDto::summary);
     }
 
-    @Transactional
-    public void syncMovies(String year) {
-        String startDate = year + "0101";
-        String endDate = year + "1231";
-        int pageSize = 100;
-        int startCount = 0;
+    @Cacheable(value = "dailyBoxOffice")
+    public DailyBoxOfficeResultDto getDailyBoxOffice() {
+        String yesterday = LocalDate.now().minusDays(1)
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-        while (true) {
-            // 1️⃣ 페이징 요청
-            List<Movie> fetchedMovies = kmdbService.fetchMoviesBetweenPaged(startDate, endDate, pageSize, startCount);
+        log.info("KOBIS API 박스오피스 조회 - targetDt: {}", yesterday);
 
-            if (fetchedMovies.isEmpty()) {
-                log.info("더 이상 가져올 영화가 없습니다. 종료.");
-                break;
-            }
-
-            // 2️⃣ DB 비교 및 갱신
-            for (Movie fetched : fetchedMovies) {
-                Optional<Movie> existingOpt = movieRepository.findByTitleAndRepRlsDateNormalized(
-                        fetched.getTitle(),
-                        fetched.getRepRlsDate()
-                );
-
-                if (existingOpt.isPresent()) {
-                    Movie existing = existingOpt.get();
-                    if (!Objects.equals(existing.getModDate(), fetched.getModDate())) {
-                        existing.updateFrom(fetched);
-                        movieRepository.save(existing);
-                        log.info("[갱신] {} ({})", fetched.getTitle(), fetched.getRepRlsDate());  // 👈 변경!
-                    }
-                } else {
-                    movieRepository.save(fetched);
-                    log.info("[신규] {} ({})", fetched.getTitle(), fetched.getRepRlsDate());  // 👈 변경!
-                }
-            }
-
-            // 3️⃣ 다음 페이지로 이동
-            startCount += pageSize;
-
-            try {
-                Thread.sleep(500); // API 과부하 방지
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+        try {
+            DailyBoxOfficeResultDto result = kobisAdapter.getDailyBoxOffice(yesterday);
+            log.info("KOBIS API 박스오피스 조회 완료 - {}건",
+                    result.getDailyBoxOfficeList().size());
+            return result;
+        } catch (Exception e) {
+            log.error("KOBIS API 박스오피스 조회 실패 - targetDt: {}", yesterday, e);
+            throw e;
         }
+    }
 
-        log.info("KMDB 영화 갱신 완료!");
+    public DailyBoxOfficeResponse getDailyBoxOfficeWithMovieInfo() {
+        log.info("박스오피스 영화 정보 조회 시작");
+
+        // 1. 박스오피스 정보 (캐시 or API)
+        DailyBoxOfficeResultDto boxOffice = getDailyBoxOffice();
+
+        // 2. 제목 리스트 추출
+        List<String> titles = boxOffice.getDailyBoxOfficeList().stream()
+                .map(BoxOfficeItemDto::getTitle)
+                .toList();
+        log.debug("박스오피스 제공 제목들: {}", titles);
+
+        // 3. DB에서 영화 정보 조회
+        List<MovieEntity> movies = movieRepository.findByTitleIn(titles);
+        //List<MovieEntity> movies = movieRepository.findByTitleContains(titles);
+        log.debug("DB 매칭된 영화 제목들: {}",
+                movies.stream().map(MovieEntity::getTitle).toList());
+        log.debug("DB 매칭 결과 - 박스오피스: {}건, DB 매칭: {}건", titles.size(), movies.size());
+
+        // 4. Map으로 변환
+        Map<String, MovieEntity> movieMap = movies.stream()
+                .collect(Collectors.toMap(MovieEntity::getTitle, m -> m));
+
+        // 5. 응답 생성
+        DailyBoxOfficeResponse response = DailyBoxOfficeResponse.from(boxOffice, movieMap);
+
+        log.info("박스오피스 영화 정보 조회 완료 - {}건", response.getMovies().size());
+
+        return response;
     }
 }
+

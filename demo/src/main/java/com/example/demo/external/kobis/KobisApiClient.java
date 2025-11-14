@@ -8,15 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 @RequiredArgsConstructor
 public class KobisApiClient {
-    private final WebClient webClient;
-
-    private static final String BASE_URL = "https://kobis.or.kr/kobisopenapi/webservice/rest";
+    private final WebClient kobisWebClient;
 
     @Value("${api.kobis.key}")
     private String KOBIS_API_KEY;
 
     public KobisDailyResponse getDailyBoxOffice(String date) {
-        return webClient.get()
+        return kobisWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/boxoffice/searchDailyBoxOfficeList.json")
                         .queryParam("key", KOBIS_API_KEY)

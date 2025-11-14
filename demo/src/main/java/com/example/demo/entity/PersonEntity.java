@@ -1,22 +1,23 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Brand {
-
+@Builder
+@Table(name = "person")
+public class PersonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long brandId;
+    private Long id;
 
-    @Column(length = 50, nullable = false)
+    @Column(unique = true)
+    private String kmdbPersonId;
+
     private String name;
+    private String nameEn;
 }

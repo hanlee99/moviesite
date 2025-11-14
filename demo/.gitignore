@@ -45,6 +45,7 @@ logs/
 Thumbs.db
 
 ### Environment / Secrets ###
-src/main/resources/application.properties
+.env
 src/main/resources/application.yml
-*.env
+src/main/resources/application.properties
+src/main/resources/application-docker.properties

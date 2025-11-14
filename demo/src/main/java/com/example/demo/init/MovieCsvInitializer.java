@@ -1,80 +1,104 @@
 package com.example.demo.init;
 
-import com.example.demo.entity.Movie;
+import com.example.demo.entity.MovieEntity;
 import com.example.demo.repository.MovieRepository;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
+/*@Slf4j
+@Profile("dev") // ✅ 개발 환경에서만 실행
 //@Component
 @RequiredArgsConstructor
 public class MovieCsvInitializer implements CommandLineRunner {
 
     private final MovieRepository movieRepository;
+    private final MovieDetailRepository movieDetailRepository;
 
     @Override
     public void run(String... args) throws Exception {
         if (movieRepository.count() > 0) {
-            System.out.println("🎬 기존 Movie 데이터가 존재하므로 CSV 로드를 건너뜁니다.");
+            log.info("🎬 기존 Movie 데이터가 존재하므로 CSV 로드를 건너뜁니다.");
             return;
         }
 
-        System.out.println("KMDB CSV 로드 시작...");
+        log.info("🚀 KMDB CSV 로드 시작...");
 
         var inputStream = getClass().getResourceAsStream("/data/KMDB_2025.csv");
         if (inputStream == null) {
             throw new IllegalStateException("CSV 파일을 찾을 수 없습니다! (/resources/data 경로 확인)");
         }
 
-        try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            String[] headers = reader.readNext(); // 헤더 스킵
-            String[] line;
-            int count = 0;
+        List<MovieEntity> movieEntities = new ArrayList<>();
+        List<MovieDetailEntity> detailEntities = new ArrayList<>();
 
+        try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String[] headers = reader.readNext(); // ✅ 헤더 스킵
+            String[] line;
+            int lineCount = 0;
 
             while ((line = reader.readNext()) != null) {
-                // 각 컬럼 순서에 맞게 인덱스 지정 (Python csv의 열 순서 그대로)
-                Movie movie = Movie.builder()
-                        .title(line[0])
-                        .titleEtc(line[1])
-                        .prodYear(line[2])
-                        .directorNm(line[3])
-                        .actorNm(line[4])
-                        .nation(line[5])
-                        .company(line[6])
-                        .plot(line[7])
-                        .runtime(line[8])
-                        .rating(line[9])
-                        .genre(line[10])
-                        .kmdbUrl(line[11])
-                        .type(line[12])
-                        .useType(line[13])
-                        .repRlsDate(line[14].replace("|",""))
-                        .releaseDates(line[15])
-                        .isReRelease(Boolean.valueOf(line[16]))
-                        .posters(line[17])
-                        .stlls(line[18])
-                        .vodUrl(line[19])
-                        .ratingNo(line[20])
-                        .ratingGrade(line[21])
-                        .modDate(line[22])
-                        .regDate(line[23])
+                // CSV 열 순서에 맞게 매핑
+                String title = safe(line, 0);
+                String prodYear = safe(line, 2);
+                String nation = safe(line, 5);
+                String genre = safe(line, 10);
+                String poster = safe(line, 17);
+
+                MovieEntity movie = MovieEntity.builder()
+                        .title(title)
+                        .prodYear(prodYear)
+                        .nation(nation)
+                        .genre(genre)
+                        .poster(poster)
+                        .rating(safe(line, 9))
+                        .repRlsDate(safe(line, 14).replace("|", ""))
                         .build();
-                System.out.println("열 개수: " + line.length);
-                System.out.println(Arrays.toString(line));
-                movieRepository.save(movie);
 
-                System.out.println("🎬 " + movie.getTitle() + " → " + movie.getPosters());
+                movieEntities.add(movie);
 
-                count++;
+                MovieDetailEntity detail = MovieDetailEntity.builder()
+                        .movie(movie)
+                        .plot(safe(line, 7))
+                        .runtime(safe(line, 8))
+                        .type(safe(line, 12))
+                        .useType(safe(line, 13))
+                        .kmdbUrl(safe(line, 11))
+                        .posters(safe(line, 17))
+                        .stills(safe(line, 18))
+                        .vodUrl(safe(line, 19))
+                        .modDate(safe(line, 22))
+                        .build();
+
+                detailEntities.add(detail);
+
+                lineCount++;
+                if (lineCount % 200 == 0) {
+                    log.info("📦 {}편 로드 중...", lineCount);
+                }
             }
 
-            System.out.println("총 " + count + "편 저장 완료! (H2 DB에 반영됨)");
+            // ✅ Batch insert
+            movieRepository.saveAll(movieEntities);
+            movieDetailRepository.saveAll(detailEntities);
+
+            log.info("✅ CSV 로드 완료! 총 {}편 저장됨", movieEntities.size());
+        } catch (Exception e) {
+            log.error("❌ CSV 로드 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
         }
     }
-}
+
+
+
+    private String safe(String[] line, int index) {
+        return (index < line.length && line[index] != null) ? line[index].trim() : null;
+    }
+}*/

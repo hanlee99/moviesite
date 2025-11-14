@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
+//@Component
+/*@RequiredArgsConstructor
 public class PosterFixRunner implements CommandLineRunner {
 
     private final PosterChangeService posterChangeService;
@@ -18,5 +18,5 @@ public class PosterFixRunner implements CommandLineRunner {
             System.err.println("⚠️ 포스터 업데이트 중 오류 발생: " + e.getMessage());
         }
     }
-}
+}*/
 

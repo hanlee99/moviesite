@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 import java.math.BigDecimal;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class CinemaCsvInitializer implements CommandLineRunner {
 
